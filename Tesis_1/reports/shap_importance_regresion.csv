@@ -1,0 +1,69 @@
+Feature,Mean_Absolute_SHAP,Coeficiente
+kilometraje_acumulado_km,0.14054362876717125,0.15430508864748863
+cilindraje_l,0.037782170305286925,0.047538776292394266
+frenadas_bruscas_por_100km,0.02293108041347869,-0.029166789307600575
+zona_operacion_quito_Valles (Cumbayá/Tumbaco/Los Chillos),0.020204963580438433,-0.02684015346663151
+transmision_Manual,0.020193366435494187,-0.02066464203803822
+tipo_mantenimiento_actual_Preventivo Periódico,0.018382338723927177,-0.019982935649704058
+repuesto_cambiado_actual_Mangueras y radiador,0.01742772512069025,0.02987543025869863
+repuesto_cambiado_actual_Reparación de motor,0.013571320598415445,0.030770670222564113
+tipo_vehiculo_Camioneta Pick-up,0.013432322122867466,-0.018038042547708542
+modelo_Fortuner,0.012928751550047773,-0.01949422553548357
+combustible_Gasolina Extra/Súper,0.011114674680572055,0.014925712245300031
+modelo_Corolla,0.010875185166627485,0.025450000972315444
+repuesto_cambiado_actual_Presión y labrado,0.010566641480921051,0.01248200960754012
+tipo_mantenimiento_actual_Inspección de Rutina,0.009440248433310674,0.014363135367888162
+zona_operacion_quito_Sur (Quitumbe/Recreo),0.008682150187892352,0.009706221388845766
+modelo_Duster,0.00760163588781942,0.019909865992691823
+ratio_recorrido_reciente,0.007145375293337053,-0.007635639051793643
+modelo_Sail,0.006278845139877404,-0.013450622091468134
+sistema_intervenido_actual_Sistema de Enfriamiento,0.004819153569266516,0.006690456579445083
+marca_Renault,0.004786457844020937,0.010999080622930013
+modelo_Captiva,0.004657511437321143,0.02745964959684711
+modelo_RAV4,0.003612352678991005,-0.005732659078514099
+modelo_D-Max,0.003514620818874414,-0.009154421791377635
+repuesto_cambiado_actual_Filtro de aire,0.0033641805282284367,-0.009994455025403822
+modelo_Picanto,0.003313564002454209,0.014129289777771578
+modelo_Sportage,0.0031838874315710144,-0.004866805896121701
+modelo_Logan,0.0022859965886346135,0.00793881905866141
+modelo_Tucson,0.0022719518345076907,-0.004265476153285905
+repuesto_cambiado_actual_Batería,0.002265786991851769,0.0032153688032187195
+modelo_Tracker,0.0021859425377662948,0.004148905551966358
+km_desde_ultimo_mantenimiento,0.002174465723697206,0.002308924913711656
+modelo_Rio,0.002123135600662707,-0.007251746699849151
+repuesto_cambiado_actual_Cambio de aceite y filtro,0.0013866775629219332,-0.002486813456714619
+"sistema_intervenido_actual_Suspensión, Dirección y Neumáticos",0.0009439317191217752,-0.0010272749412349848
+tiempo_ralenti_min_dia,0.0008963077425077112,-0.0011974391401723726
+costo_mantenimiento_actual_usd,0.0008840063438486534,0.0010013343497016459
+modelo_Onix,0.0005477348674082606,0.001790268518471385
+repuesto_cambiado_actual_Líquido de frenos,0.0005168761792461963,0.0010800738070785509
+repuesto_cambiado_actual_Luces y fusibles,0.00044038053485230804,-0.0006365180483956586
+modelo_Creta,0.00028458385354187285,0.0008462722981411427
+anio,0.0,-0.0
+indice_estres_termico_altitud,0.0,-0.0
+presion_aceite_kpa,0.0,-0.0
+temperatura_promedio_motor_c,0.0,-0.0
+tiene_codigo_obd_activo,0.0,-0.0
+altitud_operacion_m,0.0,0.0
+km_promedio_estimado_diario,0.0,0.0
+edad_vehiculo_años,0.0,0.0
+marca_Kia,0.0,-0.0
+marca_Hyundai,0.0,-0.0
+marca_Nissan,0.0,-0.0
+dias_desde_ultimo_mantenimiento,0.0,0.0
+modelo_Kicks,0.0,0.0
+modelo_Hilux,0.0,0.0
+marca_Toyota,0.0,0.0
+modelo_Frontier,0.0,-0.0
+modelo_Stepway,0.0,-0.0
+modelo_Seltos,0.0,-0.0
+modelo_Yaris,0.0,0.0
+modelo_Santa Fe,0.0,0.0
+zona_operacion_quito_Norte (Carcelén/Cotocollao),0.0,0.0
+tipo_vehiculo_SUV,0.0,0.0
+modelo_X-Trail,0.0,-0.0
+sistema_intervenido_actual_Sistema de Frenos,0.0,0.0
+repuesto_cambiado_actual_Correa o cadena de distribución,0.0,-0.0
+sistema_intervenido_actual_Sistema de Lubricación y Motor,0.0,-0.0
+repuesto_cambiado_actual_Líquido refrigerante,0.0,0.0
+repuesto_cambiado_actual_Pastillas y discos,0.0,0.0

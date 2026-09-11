@@ -1,0 +1,6 @@
+vehiculo_id,probabilidad_falla,top_factores_riesgo
+UIO-0379,0.1274,"['temperatura_promedio_motor_c (+0.206)', 'edad_vehiculo_años (+0.188)', 'anio (+0.188)']"
+UIO-0887,0.4709,"['km_desde_ultimo_mantenimiento (+0.496)', 'modelo_Rio (+0.386)', 'kilometraje_acumulado_km (+0.215)']"
+UIO-0676,0.8802,"['km_desde_ultimo_mantenimiento (+1.600)', 'tiene_codigo_obd_activo (+1.157)', 'sistema_intervenido_actual_Suspensión, Dirección y Neumáticos (+0.176)']"
+UIO-0826,0.7635,"['kilometraje_acumulado_km (+0.904)', 'km_desde_ultimo_mantenimiento (+0.836)', 'presion_aceite_kpa (+0.353)']"
+UIO-0536,0.4584,"['frenadas_bruscas_por_100km (+0.537)', 'presion_aceite_kpa (+0.501)', 'edad_vehiculo_años (+0.233)']"

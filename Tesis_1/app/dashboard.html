@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mantenimiento Predictivo - Quito</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { color: #38bdf8; margin-bottom: 5px; }
+        p.subtitle { color: #94a3b8; margin-top: 0; margin-bottom: 25px; }
+        .card-panel { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
+        select, button { padding: 12px 18px; font-size: 16px; border-radius: 8px; border: none; margin-right: 10px; }
+        select { background: #334155; color: white; }
+        button { background: #0284c7; color: white; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:hover { background: #0369a1; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
+        .metric-box { background: #0f172a; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #334155; }
+        .metric-title { font-size: 14px; color: #94a3b8; margin: 0; }
+        .metric-value { font-size: 24px; font-weight: bold; margin: 8px 0; }
+        .risk-Alto { color: #f87171; }
+        .risk-Medio { color: #fbbf24; }
+        .risk-Bajo { color: #4ade80; }
+        pre { background: #0f172a; padding: 15px; border-radius: 8px; overflow-x: auto; color: #e2e8f0; font-family: monospace; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #334155; }
+        th { background: #0f172a; color: #38bdf8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚗 Mantenimiento Predictivo Vehicular</h1>
+        <p class="subtitle">Diagnóstico y Recomendaciones Preventivas para Flotas en Quito</p>
+
+        <div class="card-panel">
+            <label for="vehiculoSelect"><b>Seleccionar Vehículo:</b> </label>
+            <select id="vehiculoSelect">
+                <option value="UIO-0676">UIO-0676</option>
+            </select>
+            <button onclick="consultarAPI()">🔍 Analizar Riesgo</button>
+            <span id="status" style="margin-left: 15px; font-weight: bold;"></span>
+        </div>
+
+        <div id="resultados" style="display: none;">
+            <div class="grid">
+                <div class="metric-box">
+                    <p class="metric-title">Nivel de Riesgo</p>
+                    <div id="valRiesgo" class="metric-value">-</div>
+                    <small id="valProb">-</small>
+                </div>
+                <div class="metric-box">
+                    <p class="metric-title">Costo Contingente Estimado</p>
+                    <div id="valCosto" class="metric-value" style="color: #38bdf8;">-</div>
+                    <small>USD</small>
+                </div>
+                <div class="metric-box">
+                    <p class="metric-title">Zona de Operación</p>
+                    <div id="valZona" class="metric-value" style="color: #4ade80;">-</div>
+                    <small>Quito</small>
+                </div>
+            </div>
+
+            <div class="card-panel" style="margin-top: 20px;">
+                <h3>📄 Reporte Explicable</h3>
+                <pre id="valReporte"></pre>
+            </div>
+
+            <div class="card-panel">
+                <h3>📊 Top Factores de Riesgo (SHAP)</h3>
+                <table id="tablaFactores">
+                    <thead>
+                        <tr><th>Factor</th><th>Impacto / Valor</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+
+        // Cargar lista de vehículos al abrir
+        async function cargarVehiculos() {
+            try {
+                const res = await fetch(`${API_URL}/vehiculos`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const select = document.getElementById("vehiculoSelect");
+                    select.innerHTML = "";
+                    data.vehiculos.forEach(v => {
+                        const opt = document.createElement("option");
+                        opt.value = v;
+                        opt.textContent = v;
+                        select.appendChild(opt);
+                    });
+                    document.getElementById("status").innerHTML = "<span style='color:#4ade80;'>🟢 API Conectada</span>";
+                }
+            } catch (e) {
+                document.getElementById("status").innerHTML = "<span style='color:#f87171;'>🔴 API Offline</span>";
+            }
+        }
+
+        async function consultarAPI() {
+            const vehiculoId = document.getElementById("vehiculoSelect").value;
+            document.getElementById("status").innerText = "Consultando...";
+            
+            try {
+                const res = await fetch(`${API_URL}/predict`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ vehiculo_id: vehiculoId })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    const ctx = data.contexto;
+
+                    document.getElementById("valRiesgo").innerText = ctx.nivel_riesgo;
+                    document.getElementById("valRiesgo").className = `metric-value risk-${ctx.nivel_riesgo}`;
+                    document.getElementById("valProb").innerText = `Probabilidad: ${(ctx.probabilidad_falla * 100).toFixed(1)}%`;
+                    document.getElementById("valCosto").innerText = `$${ctx.costo_estimado_falla_usd.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+                    document.getElementById("valZona").innerText = ctx.zona_quito;
+                    document.getElementById("valReporte").innerText = data.reporte_texto;
+
+                    // Tabla SHAP
+                    const tbody = document.querySelector("#tablaFactores tbody");
+                    tbody.innerHTML = "";
+                    ctx.top_factores_riesgo.forEach(f => {
+                        const row = `<tr><td>${f.factor || f.caracteristica || 'Variable'}</td><td>${f.valor || f.impacto || '-'}</td></tr>`;
+                        tbody.innerHTML += row;
+                    });
+
+                    document.getElementById("resultados").style.display = "block";
+                    document.getElementById("status").innerHTML = "<span style='color:#4ade80;'>🟢 Análisis Completado</span>";
+                }
+            } catch (e) {
+                document.getElementById("status").innerHTML = "<span style='color:#f87171;'>🔴 Error en la consulta</span>";
+            }
+        }
+
+        window.onload = cargarVehiculos;
+    </script>
+</body>
+</html>

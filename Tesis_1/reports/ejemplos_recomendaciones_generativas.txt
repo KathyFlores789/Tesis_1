@@ -1,0 +1,52 @@
+
+================================================================================
+REPORTE GENERATIVO DE RECOMENDACIÓN PREVENTIVA EXPLICABLE
+VEHÍCULO: UIO-0676 (Nissan Kicks - Año 2020) | OPERACIÓN: Norte (Carcelén/Cotocollao)
+================================================================================
+
+1. DIAGNÓSTICO DE RIESGO PREDICTIVO
+   • Nivel de Riesgo Operacional : CRÍTICO (88.0% de probabilidad de falla a 30 días)
+   • Estimación de Costo Futuro  : $347.74 USD (En caso de falla no atendida)
+
+2. EVIDENCIA Y EXPLICABILIDAD TÉCNICA (SHAP Analysis)
+   El análisis de inteligencia artificial identifica que el riesgo se debe principalmente a:
+  • Exceso de recorrido desde el último servicio (+1.5997 impacto en riesgo).
+  • Presencia de un código de falla OBD activo (+1.1574 impacto en riesgo).
+  • Variable de desgaste operacional: sistema_intervenido_actual_Suspensión, Dirección y Neumáticos (+0.1764 impacto).
+
+3. PLAN DE ACCIÓN PREVENTIVA RECOMENDADO
+   1. Agendar mantenimiento preventivo inmediato de fluidos y filtros.
+   2. Efectuar escaneo telemétrico OBD-II para diagnosticar el código registrado.
+   3. Realizar inspección técnica general de seguridad vehicular.
+
+4. IMPACTO FINANCIERO ESTIMADO
+   Invertir en un mantenimiento preventivo oportuno (~$80 - $150 USD) evitaría
+   una falla correctiva severa estimada en $347.74 USD.
+================================================================================
+
+
+
+================================================================================
+REPORTE GENERATIVO DE RECOMENDACIÓN PREVENTIVA EXPLICABLE
+VEHÍCULO: UIO-0379 (Renault Logan - Año 2022) | OPERACIÓN: Sur (Quitumbe/Recreo)
+================================================================================
+
+1. DIAGNÓSTICO DE RIESGO PREDICTIVO
+   • Nivel de Riesgo Operacional : BAJO (12.7% de probabilidad de falla a 30 días)
+   • Estimación de Costo Futuro  : $365.83 USD (En caso de falla no atendida)
+
+2. EVIDENCIA Y EXPLICABILIDAD TÉCNICA (SHAP Analysis)
+   El análisis de inteligencia artificial identifica que el riesgo se debe principalmente a:
+  • Variable de desgaste operacional: temperatura_promedio_motor_c (+0.2058 impacto).
+  • Variable de desgaste operacional: edad_vehiculo_años (+0.1881 impacto).
+  • Variable de desgaste operacional: anio (+0.1881 impacto).
+
+3. PLAN DE ACCIÓN PREVENTIVA RECOMENDADO
+   1. Realizar inspección técnica general de seguridad vehicular.
+   2. Realizar inspección técnica general de seguridad vehicular.
+   3. Realizar inspección técnica general de seguridad vehicular.
+
+4. IMPACTO FINANCIERO ESTIMADO
+   Invertir en un mantenimiento preventivo oportuno (~$80 - $150 USD) evitaría
+   una falla correctiva severa estimada en $365.83 USD.
+================================================================================

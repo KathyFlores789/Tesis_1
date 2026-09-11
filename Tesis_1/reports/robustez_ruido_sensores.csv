@@ -1,0 +1,4 @@
+Escenario,ROC_AUC,F1_Score
+Original TEST,0.7742,0.6531
+Con Ruido Telemetría (±5%),0.7774,0.6667
+Diferencia (Degradación),0.0032,0.0136

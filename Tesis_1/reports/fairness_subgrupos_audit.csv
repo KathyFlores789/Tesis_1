@@ -1,0 +1,10 @@
+Atributo,Subgrupo,Muestras,Tasa_Falla_Real,Accuracy,F1_Score,ROC_AUC
+tipo_vehiculo,Automóvil,50,0.32,0.58,0.462,0.711
+tipo_vehiculo,Camioneta Pick-up,19,0.579,0.632,0.632,0.716
+tipo_vehiculo,SUV,81,0.58,0.716,0.742,0.818
+combustible,Diésel,19,0.579,0.632,0.632,0.716
+combustible,Gasolina Extra/Súper,131,0.481,0.664,0.656,0.783
+zona_operacion_quito,Centro/Hipercentro,38,0.553,0.711,0.732,0.801
+zona_operacion_quito,Norte (Carcelén/Cotocollao),48,0.438,0.604,0.578,0.734
+zona_operacion_quito,Sur (Quitumbe/Recreo),44,0.477,0.659,0.634,0.805
+zona_operacion_quito,Valles (Cumbayá/Tumbaco/Los Chillos),20,0.55,0.7,0.7,0.778
