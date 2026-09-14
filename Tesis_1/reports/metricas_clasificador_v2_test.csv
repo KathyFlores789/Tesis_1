@@ -1,0 +1,2 @@
+modelo,dataset,n_test,umbral,accuracy,precision,recall,f1_score,roc_auc,tn,fp,fn,tp
+classifier_v2,test,150,0.5,0.68,0.703125,0.6081081081081081,0.6521739130434783,0.766180654338549,57,19,29,45

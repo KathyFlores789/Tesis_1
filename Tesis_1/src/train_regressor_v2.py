@@ -9,6 +9,8 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 
+from sklearn.base import clone
+
 from sklearn.linear_model import LinearRegression, Ridge, ElasticNet
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 
@@ -359,3 +361,122 @@ print("Modelo:", best_log_result["modelo"])
 print("MAE :", round(best_log_result["mae"], 2))
 print("RMSE:", round(best_log_result["rmse"], 2))
 print("R²  :", round(best_log_result["r2"], 4))
+
+
+
+# ============================================================
+# EVALUACIÓN FINAL DEL REGRESOR LOGARÍTMICO EN TEST
+# ============================================================
+
+print("\n" + "=" * 60)
+print("EVALUACIÓN FINAL DEL REGRESOR LOG - TEST")
+print("=" * 60)
+
+# El modelo ganador fue seleccionado únicamente con Validation.
+# Ahora se evalúa una sola vez sobre Test.
+y_test_pred_log = best_log_model.predict(X_test)
+
+# Regresar de escala logarítmica a dólares
+y_test_pred_usd = np.expm1(y_test_pred_log)
+
+# Evitar valores negativos
+y_test_pred_usd = np.maximum(y_test_pred_usd, 0)
+
+test_mae = mean_absolute_error(
+    y_test,
+    y_test_pred_usd
+)
+
+test_rmse = np.sqrt(
+    mean_squared_error(
+        y_test,
+        y_test_pred_usd
+    )
+)
+
+test_r2 = r2_score(
+    y_test,
+    y_test_pred_usd
+)
+
+print("Modelo:", best_log_result["modelo"])
+print("MAE :", round(test_mae, 2))
+print("RMSE:", round(test_rmse, 2))
+print("R²  :", round(test_r2, 4))
+
+
+# ============================================================
+# ENTRENAMIENTO DEL MODELO FINAL
+# TRAIN + VALIDATION
+# ============================================================
+
+print("\n" + "=" * 60)
+print("ENTRENAMIENTO DEL REGRESOR FINAL")
+print("=" * 60)
+
+X_train_final = pd.concat(
+    [
+        X_train,
+        X_val
+    ],
+    axis=0
+)
+
+y_train_final = pd.concat(
+    [
+        y_train,
+        y_val
+    ],
+    axis=0
+)
+
+# El objetivo final también debe entrenarse en escala logarítmica
+y_train_final_log = np.log1p(
+    y_train_final
+)
+
+# Clonar el pipeline ganador
+final_regressor = clone(
+    best_log_model
+)
+
+# Entrenar con Train + Validation
+final_regressor.fit(
+    X_train_final,
+    y_train_final_log
+)
+
+
+# ============================================================
+# GUARDAR MODELO
+# ============================================================
+
+REGRESSOR_PATH = (
+    MODELS_DIR
+    / "regressor_v2.joblib"
+)
+
+joblib.dump(
+    final_regressor,
+    REGRESSOR_PATH
+)
+
+print(
+    "Modelo final entrenado con:",
+    len(X_train_final),
+    "registros"
+)
+
+print(
+    "Modelo guardado en:"
+)
+
+print(
+    REGRESSOR_PATH
+)
+
+print(
+    "IMPORTANTE: la salida del modelo está "
+    "en escala log1p y debe convertirse "
+    "a USD usando np.expm1()."
+)

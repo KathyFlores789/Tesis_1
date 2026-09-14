@@ -1,6 +1,8 @@
 from pathlib import Path
+import sys
 
 import joblib
+import numpy as np
 import pandas as pd
 import streamlit as st
 
@@ -22,6 +24,13 @@ st.set_page_config(
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 
+if str(ROOT_DIR) not in sys.path:
+    sys.path.append(str(ROOT_DIR))
+
+from src.explicabilidad_shap_v2 import explicar_prediccion
+from src.generador_ia_v2 import generar_recomendacion_ia
+
+
 DATA_PATH = (
     ROOT_DIR
     / "data"
@@ -33,6 +42,12 @@ MODEL_PATH = (
     ROOT_DIR
     / "models"
     / "classifier_v2.joblib"
+)
+
+REGRESSOR_PATH = (
+    ROOT_DIR
+    / "models"
+    / "regressor_v2.joblib"
 )
 
 
@@ -50,8 +65,14 @@ def cargar_modelo():
     return joblib.load(MODEL_PATH)
 
 
+@st.cache_resource
+def cargar_regresor():
+    return joblib.load(REGRESSOR_PATH)
+
+
 df = cargar_datos()
 modelo = cargar_modelo()
+regresor = cargar_regresor()
 
 
 # ============================================================
@@ -114,11 +135,21 @@ def predecir_riesgo(datos_entrada):
     return probabilidad, prediccion, nivel_riesgo
 
 
-def mostrar_resultado(probabilidad, prediccion, nivel_riesgo):
+def estimar_costo(datos_entrada):
+    """
+    El regresor fue entrenado sobre log1p(costo), por lo que
+    su salida se convierte nuevamente a USD mediante expm1().
+    """
+    pred_log = float(regresor.predict(datos_entrada)[0])
+    costo_usd = float(np.expm1(pred_log))
+    return max(costo_usd, 0.0)
+
+
+def mostrar_resultado(probabilidad, prediccion, nivel_riesgo, costo_estimado):
     st.divider()
     st.subheader("📊 Resultado de la predicción")
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
 
     with col1:
         st.metric(
@@ -134,9 +165,21 @@ def mostrar_resultado(probabilidad, prediccion, nivel_riesgo):
 
     with col3:
         st.metric(
+            "Costo aproximado",
+            f"${costo_estimado:,.2f} USD"
+        )
+
+    with col4:
+        st.metric(
             "Umbral de decisión",
             f"{UMBRAL * 100:.0f}%"
         )
+
+    st.caption(
+        "💰 El costo es una estimación orientativa y condicional a que "
+        "ocurra una falla o sea necesaria una intervención. El valor real "
+        "puede variar según el diagnóstico técnico, repuestos y trabajo requerido."
+    )
 
     if prediccion == 1:
         st.error(
@@ -150,15 +193,165 @@ def mostrar_resultado(probabilidad, prediccion, nivel_riesgo):
         )
 
 
+def mostrar_factores_shap(aumentan, reducen):
+    """
+    Muestra los factores SHAP con colores intuitivos:
+    - Rojo: aumenta la estimación de riesgo
+    - Verde: reduce la estimación de riesgo
+    """
+
+    st.divider()
+    st.subheader("🧠 ¿Por qué el modelo obtuvo este resultado?")
+
+    st.info(
+        "SHAP identifica las variables que más influyeron en esta "
+        "predicción. Los factores muestran cómo aumentan o reducen "
+        "la estimación de riesgo del modelo y no representan, por sí "
+        "solos, causas directas de una falla."
+    )
+
+    col_shap_1, col_shap_2 = st.columns(2)
+
+    with col_shap_1:
+        st.markdown("### ⬆️ Factores que aumentan la estimación")
+
+        if aumentan is None or aumentan.empty:
+            st.write("No se identificaron factores positivos relevantes.")
+        else:
+            for _, fila in aumentan.iterrows():
+                factor = fila["factor"]
+                valor = fila["valor"]
+                shap_val = float(fila["shap"])
+
+                st.markdown(
+                    f"""
+                    <div style="margin-bottom:18px;">
+                        <b>{factor}:</b> {valor}
+                        — impacto SHAP:
+                        <span style="
+                            background-color: rgba(255, 75, 75, 0.15);
+                            color: #ff4b4b;
+                            padding: 3px 7px;
+                            border-radius: 5px;
+                            font-family: monospace;
+                            font-weight: bold;
+                        ">
+                            +{abs(shap_val):.4f}
+                        </span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+    with col_shap_2:
+        st.markdown("### ⬇️ Factores que reducen la estimación")
+
+        if reducen is None or reducen.empty:
+            st.write("No se identificaron factores negativos relevantes.")
+        else:
+            for _, fila in reducen.iterrows():
+                factor = fila["factor"]
+                valor = fila["valor"]
+                shap_val = float(fila["shap"])
+
+                st.markdown(
+                    f"""
+                    <div style="margin-bottom:18px;">
+                        <b>{factor}:</b> {valor}
+                        — impacto SHAP:
+                        <span style="
+                            background-color: rgba(0, 200, 120, 0.15);
+                            color: #32d583;
+                            padding: 3px 7px;
+                            border-radius: 5px;
+                            font-family: monospace;
+                            font-weight: bold;
+                        ">
+                            -{abs(shap_val):.4f}
+                        </span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+
+def calcular_shap_seguro(datos_vehiculo, top_n=3):
+    try:
+        return explicar_prediccion(
+            datos_vehiculo,
+            top_n=top_n
+        )
+    except Exception as error:
+        st.warning(
+            "No fue posible calcular SHAP para esta predicción. "
+            f"Detalle técnico: {error}"
+        )
+        return pd.DataFrame(), pd.DataFrame()
+
+
+def mostrar_recomendacion_ia(texto):
+    st.divider()
+    st.subheader("🤖 Análisis y recomendación generada por IA")
+
+    st.caption(
+        "La IA Generativa utiliza la predicción del modelo y los factores "
+        "SHAP como contexto. No realiza un diagnóstico mecánico autónomo."
+    )
+
+    # Mejorar la presentación de las secciones generadas.
+    texto_formateado = texto
+    reemplazos = {
+        "RESUMEN:": "### Resumen",
+        "INTERPRETACIÓN:": "### Interpretación",
+        "RECOMENDACIÓN PREVENTIVA:": "### Recomendación preventiva",
+        "ADVERTENCIA:": "### Advertencia",
+    }
+
+    for origen, destino in reemplazos.items():
+        texto_formateado = texto_formateado.replace(origen, destino)
+
+    st.markdown(texto_formateado)
+
+
 # ============================================================
-# ESTADO DE SESIÓN PARA VEHÍCULO NUEVO
+# ESTADO DE SESIÓN
 # ============================================================
 
+# Vehículo existente
+if "existente_id_analizado" not in st.session_state:
+    st.session_state.existente_id_analizado = None
+
+if "existente_analizado" not in st.session_state:
+    st.session_state.existente_analizado = None
+
+if "resultado_existente" not in st.session_state:
+    st.session_state.resultado_existente = None
+
+if "shap_aumentan_existente" not in st.session_state:
+    st.session_state.shap_aumentan_existente = None
+
+if "shap_reducen_existente" not in st.session_state:
+    st.session_state.shap_reducen_existente = None
+
+if "ia_existente" not in st.session_state:
+    st.session_state.ia_existente = None
+
+
+# Vehículo nuevo
 if "nuevo_analizado" not in st.session_state:
     st.session_state.nuevo_analizado = None
 
 if "resultado_nuevo" not in st.session_state:
     st.session_state.resultado_nuevo = None
+
+if "shap_aumentan_nuevo" not in st.session_state:
+    st.session_state.shap_aumentan_nuevo = None
+
+if "shap_reducen_nuevo" not in st.session_state:
+    st.session_state.shap_reducen_nuevo = None
+
+if "ia_nuevo" not in st.session_state:
+    st.session_state.ia_nuevo = None
 
 
 # ============================================================
@@ -240,11 +433,89 @@ if opcion == "🔍 Consultar vehículo":
             X_existente
         )
 
-        mostrar_resultado(
-            probabilidad,
-            prediccion,
-            nivel_riesgo
+        costo_estimado = estimar_costo(
+            X_existente
         )
+
+        aumentan, reducen = calcular_shap_seguro(
+            X_existente,
+            top_n=3
+        )
+
+        st.session_state.existente_id_analizado = vehiculo_id
+        st.session_state.existente_analizado = X_existente
+        st.session_state.resultado_existente = {
+            "probabilidad": probabilidad,
+            "prediccion": prediccion,
+            "nivel_riesgo": nivel_riesgo,
+            "costo_estimado": costo_estimado
+        }
+        st.session_state.shap_aumentan_existente = aumentan
+        st.session_state.shap_reducen_existente = reducen
+
+        # Una nueva predicción invalida la recomendación anterior.
+        st.session_state.ia_existente = None
+
+    # --------------------------------------------------------
+    # MOSTRAR ANÁLISIS DEL VEHÍCULO EXISTENTE
+    # --------------------------------------------------------
+
+    if (
+        st.session_state.existente_id_analizado == vehiculo_id
+        and st.session_state.existente_analizado is not None
+        and st.session_state.resultado_existente is not None
+    ):
+
+        resultado = st.session_state.resultado_existente
+
+        mostrar_resultado(
+            resultado["probabilidad"],
+            resultado["prediccion"],
+            resultado["nivel_riesgo"],
+            resultado["costo_estimado"]
+        )
+
+        mostrar_factores_shap(
+            st.session_state.shap_aumentan_existente,
+            st.session_state.shap_reducen_existente
+        )
+
+        st.divider()
+        st.subheader("✨ Inteligencia Artificial Generativa")
+
+        st.write(
+            "Genera una explicación en lenguaje natural a partir de la "
+            "predicción y de los factores SHAP mostrados anteriormente."
+        )
+
+        if st.button(
+            "🤖 Generar análisis y recomendación",
+            type="primary",
+            key=f"btn_ia_existente_{vehiculo_id}"
+        ):
+            try:
+                with st.spinner(
+                    "Generando explicación y recomendación con IA..."
+                ):
+                    st.session_state.ia_existente = generar_recomendacion_ia(
+                        datos_vehiculo=st.session_state.existente_analizado,
+                        probabilidad=resultado["probabilidad"],
+                        nivel_riesgo=resultado["nivel_riesgo"],
+                        costo_estimado=resultado["costo_estimado"],
+                        factores_aumentan=st.session_state.shap_aumentan_existente,
+                        factores_reducen=st.session_state.shap_reducen_existente
+                    )
+
+            except Exception as error:
+                st.error(
+                    "No fue posible generar la recomendación con IA en este "
+                    f"momento. Detalle técnico: {error}"
+                )
+
+        if st.session_state.ia_existente:
+            mostrar_recomendacion_ia(
+                st.session_state.ia_existente
+            )
 
 
 # ============================================================
@@ -592,13 +863,29 @@ elif opcion == "➕ Añadir nuevo vehículo":
             nuevo
         )
 
+        costo_estimado = estimar_costo(
+            nuevo
+        )
+
+        aumentan, reducen = calcular_shap_seguro(
+            nuevo,
+            top_n=3
+        )
+
         st.session_state.nuevo_analizado = nuevo
 
         st.session_state.resultado_nuevo = {
             "probabilidad": probabilidad,
             "prediccion": prediccion,
-            "nivel_riesgo": nivel_riesgo
+            "nivel_riesgo": nivel_riesgo,
+            "costo_estimado": costo_estimado
         }
+
+        st.session_state.shap_aumentan_nuevo = aumentan
+        st.session_state.shap_reducen_nuevo = reducen
+
+        # Una nueva predicción invalida la recomendación anterior.
+        st.session_state.ia_nuevo = None
 
     # --------------------------------------------------------
     # MOSTRAR RESULTADO GUARDADO EN SESIÓN
@@ -614,8 +901,55 @@ elif opcion == "➕ Añadir nuevo vehículo":
         mostrar_resultado(
             resultado["probabilidad"],
             resultado["prediccion"],
-            resultado["nivel_riesgo"]
+            resultado["nivel_riesgo"],
+            resultado["costo_estimado"]
         )
+
+        mostrar_factores_shap(
+            st.session_state.shap_aumentan_nuevo,
+            st.session_state.shap_reducen_nuevo
+        )
+
+        # ----------------------------------------------------
+        # IA GENERATIVA
+        # ----------------------------------------------------
+
+        st.divider()
+        st.subheader("✨ Inteligencia Artificial Generativa")
+
+        st.write(
+            "Genera una explicación y recomendación preventiva en lenguaje "
+            "natural a partir de la predicción y de los factores SHAP."
+        )
+
+        if st.button(
+            "🤖 Generar análisis y recomendación",
+            type="primary",
+            key="btn_ia_nuevo"
+        ):
+            try:
+                with st.spinner(
+                    "Generando explicación y recomendación con IA..."
+                ):
+                    st.session_state.ia_nuevo = generar_recomendacion_ia(
+                        datos_vehiculo=st.session_state.nuevo_analizado,
+                        probabilidad=resultado["probabilidad"],
+                        nivel_riesgo=resultado["nivel_riesgo"],
+                        costo_estimado=resultado["costo_estimado"],
+                        factores_aumentan=st.session_state.shap_aumentan_nuevo,
+                        factores_reducen=st.session_state.shap_reducen_nuevo
+                    )
+
+            except Exception as error:
+                st.error(
+                    "No fue posible generar la recomendación con IA en este "
+                    f"momento. Detalle técnico: {error}"
+                )
+
+        if st.session_state.ia_nuevo:
+            mostrar_recomendacion_ia(
+                st.session_state.ia_nuevo
+            )
 
         st.divider()
 
@@ -679,6 +1013,9 @@ elif opcion == "➕ Añadir nuevo vehículo":
 
             st.session_state.nuevo_analizado = None
             st.session_state.resultado_nuevo = None
+            st.session_state.shap_aumentan_nuevo = None
+            st.session_state.shap_reducen_nuevo = None
+            st.session_state.ia_nuevo = None
 
             st.success(
                 f"✅ Vehículo {nuevo_id} "

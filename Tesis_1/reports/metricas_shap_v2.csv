@@ -1,0 +1,2 @@
+modelo,dataset,n_test,n_features_transformadas,error_reconstruccion_medio,error_reconstruccion_max
+classifier_v2,test,150,73,2.6987671356929845e-16,1.7763568394002505e-15

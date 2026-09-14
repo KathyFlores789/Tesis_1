@@ -1,0 +1,2 @@
+modelo,dataset,n_test,mae,rmse,r2,error_absoluto_mediano
+regressor_v2,test,70,113.2194233599332,197.0180776167813,0.03988670907876235,57.01914591302972
