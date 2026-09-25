@@ -12,7 +12,7 @@ import streamlit as st
 # ============================================================
 
 st.set_page_config(
-    page_title="Mantenimiento Inteligente | V8",
+    page_title="Mantenimiento Inteligente | V10",
     page_icon="🚗",
     layout="wide"
 )
@@ -219,10 +219,10 @@ def mostrar_sistemas_experimentales(datos_entrada):
     st.subheader("🔬 Exploración de posibles sistemas de falla")
     with st.expander("Ver distribución experimental entre los cinco sistemas", expanded=False):
         st.caption(
-            "Estos porcentajes se calculan suponiendo que ocurre una falla "
-            "en los próximos 30 días. NO representan la probabilidad de que "
-            "cada sistema falle en todos los vehículos y NO están calibrados. "
-            "Diferencias pequeñas entre barras no deben interpretarse como evidencia."
+            "Distribución estimada de los sistemas que podrían verse afectados "
+            "si el vehículo presenta una falla en los próximos 30 días. "
+            "Los resultados son orientativos y deben complementarse con "
+            "una revisión técnica del vehículo."
         )
         try:
             clasificador = cargar_clasificador_sistemas()
@@ -594,6 +594,68 @@ if opcion == "🔍 Consultar vehículo":
         """,
         unsafe_allow_html=True
     )
+
+    # Ficha completa del registro seleccionado: solo datos conocidos al analizar.
+    # Las columnas de fallas futuras son resultados históricos, no estado actual.
+    with st.expander("📋 Ver ficha completa del vehículo", expanded=False):
+        st.caption("Datos registrados del vehículo y de su mantenimiento actual.")
+
+        def mostrar_dato(etiqueta, columna, unidad="", decimales=None):
+            if columna not in registro.index or pd.isna(registro[columna]):
+                valor = "No registrado"
+            else:
+                dato = registro[columna]
+                if isinstance(dato, str) and not dato.strip():
+                    valor = "No registrado"
+                elif decimales is not None:
+                    try:
+                        valor = f"{float(dato):,.{decimales}f}{unidad}"
+                    except (TypeError, ValueError):
+                        valor = f"{dato}{unidad}"
+                else:
+                    valor = f"{dato}{unidad}"
+            st.markdown(f"**{etiqueta}:** {valor}")
+
+        st.markdown("#### 🚗 Identificación y características")
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            mostrar_dato("ID", "vehiculo_id")
+            mostrar_dato("Marca", "marca")
+            mostrar_dato("Modelo", "modelo")
+        with c2:
+            mostrar_dato("Año", "anio", decimales=0)
+            mostrar_dato("Tipo de vehículo", "tipo_vehiculo")
+            mostrar_dato("Combustible", "combustible")
+        with c3:
+            mostrar_dato("Cilindraje", "cilindraje_l", " L", 1)
+            mostrar_dato("Transmisión", "transmision")
+            mostrar_dato("Zona de operación", "zona_operacion_quito")
+            mostrar_dato("Altitud de operación", "altitud_operacion_m", " m", 0)
+
+        st.markdown("#### 🛣️ Uso y condiciones de funcionamiento")
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            mostrar_dato("Kilometraje acumulado", "kilometraje_acumulado_km", " km", 0)
+            mostrar_dato("Km desde el último mantenimiento", "km_desde_ultimo_mantenimiento", " km", 0)
+        with c2:
+            mostrar_dato("Temperatura promedio del motor", "temperatura_promedio_motor_c", " °C", 1)
+            mostrar_dato("Presión de aceite", "presion_aceite_kpa", " kPa", 1)
+        with c3:
+            mostrar_dato("Frenadas bruscas por 100 km", "frenadas_bruscas_por_100km", decimales=1)
+            mostrar_dato("Tiempo en ralentí", "tiempo_ralenti_min_dia", " min/día", 1)
+            mostrar_dato("Código OBD activo", "tiene_codigo_obd_activo")
+
+        st.markdown("#### 🔧 Mantenimiento registrado")
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            mostrar_dato("Fecha de mantenimiento", "fecha_mantenimiento")
+            mostrar_dato("Días desde el último mantenimiento", "dias_desde_ultimo_mantenimiento", " días", 0)
+        with c2:
+            mostrar_dato("Tipo de mantenimiento", "tipo_mantenimiento_actual")
+            mostrar_dato("Sistema intervenido", "sistema_intervenido_actual")
+        with c3:
+            mostrar_dato("Repuesto cambiado", "repuesto_cambiado_actual")
+            mostrar_dato("Costo del mantenimiento", "costo_mantenimiento_actual_usd", " USD", 2)
 
     if st.button(
         "🔍 Analizar riesgo",
