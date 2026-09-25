@@ -1,0 +1,80 @@
+{
+  "target": "sistema_falla_futura",
+  "conditional_on": "falla_futura_30d == 1",
+  "features": [
+    "marca",
+    "modelo",
+    "tipo_vehiculo",
+    "combustible",
+    "transmision",
+    "zona_operacion_quito",
+    "tiene_codigo_obd_activo",
+    "tipo_mantenimiento_actual",
+    "sistema_intervenido_actual",
+    "repuesto_cambiado_actual",
+    "anio",
+    "cilindraje_l",
+    "kilometraje_acumulado_km",
+    "km_desde_ultimo_mantenimiento",
+    "dias_desde_ultimo_mantenimiento",
+    "temperatura_promedio_motor_c",
+    "presion_aceite_kpa",
+    "frenadas_bruscas_por_100km",
+    "tiempo_ralenti_min_dia",
+    "altitud_operacion_m",
+    "costo_mantenimiento_actual_usd"
+  ],
+  "categorical_features": [
+    "marca",
+    "modelo",
+    "tipo_vehiculo",
+    "combustible",
+    "transmision",
+    "zona_operacion_quito",
+    "tiene_codigo_obd_activo",
+    "tipo_mantenimiento_actual",
+    "sistema_intervenido_actual",
+    "repuesto_cambiado_actual"
+  ],
+  "numeric_features": [
+    "anio",
+    "cilindraje_l",
+    "kilometraje_acumulado_km",
+    "km_desde_ultimo_mantenimiento",
+    "dias_desde_ultimo_mantenimiento",
+    "temperatura_promedio_motor_c",
+    "presion_aceite_kpa",
+    "frenadas_bruscas_por_100km",
+    "tiempo_ralenti_min_dia",
+    "altitud_operacion_m",
+    "costo_mantenimiento_actual_usd"
+  ],
+  "selected_model": "LogisticRegression",
+  "validation_metrics": {
+    "LogisticRegression": {
+      "accuracy": 0.18840579710144928,
+      "f1_macro": 0.18711038961038962
+    },
+    "RandomForest": {
+      "accuracy": 0.17391304347826086,
+      "f1_macro": 0.17019240019240017
+    }
+  },
+  "test_metrics": {
+    "accuracy": 0.22857142857142856,
+    "f1_macro": 0.22815440764466252
+  },
+  "split": {
+    "train": 322,
+    "validation": 69,
+    "test": 70
+  },
+  "classes": [
+    "Sistema Eléctrico y Batería",
+    "Sistema de Enfriamiento",
+    "Sistema de Frenos",
+    "Sistema de Lubricación y Motor",
+    "Suspensión, Dirección y Neumáticos"
+  ],
+  "note": "Experimental. Predicted probabilities are not calibrated."
+}

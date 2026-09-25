@@ -1,0 +1,14 @@
+﻿variable,spearman_train
+kilometraje_acumulado_km,0.512
+anio,-0.451
+edad_en_mantenimiento,0.451
+km_por_anio_aprox,0.281
+frenadas_bruscas_por_100km,-0.128
+altitud_operacion_m,0.065
+km_desde_ultimo_mantenimiento,-0.062
+dias_desde_ultimo_mantenimiento,-0.061
+cilindraje_l,0.054
+presion_aceite_kpa,-0.03
+temperatura_promedio_motor_c,0.03
+tiempo_ralenti_min_dia,0.022
+costo_mantenimiento_actual_usd,0.001
