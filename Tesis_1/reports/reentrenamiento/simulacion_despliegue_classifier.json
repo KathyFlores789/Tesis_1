@@ -1,0 +1,11 @@
+{
+  "fecha_hora": "2026-10-01T17:03:16",
+  "accion": "simulacion_aprobacion_despliegue",
+  "quality_gate": "APTO_TECNICAMENTE_PROMOCION_BLOQUEADA",
+  "modelo_activo": "models\\classifier_v2.joblib",
+  "candidato": "models\\candidatos\\classifier_candidato_prueba.joblib",
+  "sha256_modelo_activo": "3f5837630be51aa7d64b245d470a69370150ad9bac7111f8c6007e95c103c590",
+  "sha256_candidato": "4a246f580d33ad39c27f790b13543f420cc9bec67b17dd765a1de12e52654a38",
+  "aprobacion_humana_simulada": true,
+  "archivos_modificados": false
+}

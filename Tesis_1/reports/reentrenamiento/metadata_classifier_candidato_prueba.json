@@ -1,0 +1,10 @@
+{
+  "tipo": "classifier_candidato_prueba",
+  "uso": "prueba_pipeline_reentrenamiento_no_promover",
+  "umbral_evaluacion": 0.5,
+  "historicos_desarrollo": 850,
+  "nuevos_validados": 3,
+  "total_entrenamiento_candidato": 853,
+  "test_original_preservado": 150,
+  "nota": "Los nuevos registros usados en esta ejecución son ficticios. El modelo candidato no debe sustituir al modelo desplegado."
+}

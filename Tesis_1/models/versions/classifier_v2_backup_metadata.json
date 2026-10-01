@@ -1,0 +1,27 @@
+{
+  "modelo": "classifier_v2",
+  "archivo_produccion": "C:\\Users\\Kathy Flores\\Desktop\\Tesis_1\\Tesis_1\\models\\classifier_v2.joblib",
+  "archivo_backup": "C:\\Users\\Kathy Flores\\Desktop\\Tesis_1\\Tesis_1\\models\\versions\\classifier_v2_backup.joblib",
+  "version": "v2",
+  "tipo_registro": "backup_modelo_produccion",
+  "estado": "produccion_actual_respaldada",
+  "fecha_versionamiento": "2026-10-01T12:10:52.349785-05:00",
+  "sha256_original": "3f5837630be51aa7d64b245d470a69370150ad9bac7111f8c6007e95c103c590",
+  "sha256_backup": "3f5837630be51aa7d64b245d470a69370150ad9bac7111f8c6007e95c103c590",
+  "integridad_verificada": true,
+  "metricas_referencia": {
+    "accuracy": 0.68,
+    "precision": 0.703125,
+    "recall": 0.6081081081081081,
+    "f1": 0.6521739130434783,
+    "roc_auc": 0.766180654338549,
+    "tn": 57,
+    "fp": 19,
+    "fn": 29,
+    "tp": 45
+  },
+  "umbral_clasificacion": 0.5,
+  "promocion_automatica": false,
+  "rollback_disponible": true,
+  "nota": "Copia de seguridad del classifier_v2 actualmente desplegado. Este proceso no promovió ni reemplazó ningún modelo."
+}

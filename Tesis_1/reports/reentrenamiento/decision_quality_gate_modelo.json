@@ -1,0 +1,16 @@
+{
+  "decision": "APTO_TECNICAMENTE_PROMOCION_BLOQUEADA",
+  "gate_tecnico_superado": true,
+  "datos_prueba_detectados": true,
+  "promocion_automatica": false,
+  "promocion_autorizada": false,
+  "requiere_revision_humana": true,
+  "modelo_actual": "classifier_v2.joblib",
+  "modelo_candidato": "classifier_candidato_prueba.joblib",
+  "criterios": {
+    "max_caida_f1": 0.01,
+    "max_caida_roc_auc": 0.01,
+    "max_caida_recall": 0.02
+  },
+  "motivo": "El candidato cumple los límites técnicos, pero la ejecución contiene registros ficticios/de prueba. No se autoriza promoción."
+}
