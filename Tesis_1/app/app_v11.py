@@ -677,6 +677,37 @@ def leer_json_seguro(ruta):
         return None
 
 
+def simular_consolidacion_validados():
+    """Identifica registros validados consolidables sin modificar los archivos."""
+    historico = cargar_datos_historicos()
+    seguimiento = cargar_datos_seguimiento()
+
+    if "estado_seguimiento" not in seguimiento.columns:
+        return None
+
+    validados = seguimiento[
+        seguimiento["estado_seguimiento"]
+        .fillna("")
+        .astype(str)
+        .str.strip()
+        .str.casefold()
+        .eq("validado")
+    ].copy()
+
+    ids = (
+        validados["vehiculo_id"].astype(str).tolist()
+        if "vehiculo_id" in validados.columns
+        else []
+    )
+
+    return {
+        "historico_actual": len(historico),
+        "cantidad_validados": len(validados),
+        "historico_resultante": len(historico) + len(validados),
+        "ids": ids,
+    }
+
+
 # ============================================================
 # ESTADO DE SESIÓN
 # ============================================================
@@ -743,19 +774,37 @@ st.sidebar.markdown("""
 
 st.sidebar.markdown("### Navegación")
 
-opcion = st.sidebar.radio(
+if "opcion" not in st.session_state:
+    st.session_state.opcion = "🔍 Consultar vehículo"
+
+opcion_principal = st.sidebar.radio(
     "Seleccione una opción:",
     [
         "🔍 Consultar vehículo",
         "➕ Añadir nuevo vehículo",
         "📋 Seguimiento de vehículos",
-        "🔄 Actualización del modelo"
-    ]
+    ],
+    key="menu_principal"
 )
+
+if opcion_principal != st.session_state.get("ultima_opcion_principal", opcion_principal):
+    st.session_state.opcion = opcion_principal
+
+st.session_state.ultima_opcion_principal = opcion_principal
+
+with st.sidebar.expander("⚙️ Opciones avanzadas", expanded=False):
+    if st.button(
+        "🔄 Actualización del modelo",
+        use_container_width=True,
+        key="btn_menu_actualizacion_modelo"
+    ):
+        st.session_state.opcion = "🔄 Actualización del modelo"
+
+opcion = st.session_state.opcion
 
 st.sidebar.divider()
 st.sidebar.success("● Modelos cargados correctamente")
-st.sidebar.metric("Vehículos registrados", f"{len(df):,}")
+st.sidebar.metric("Vehículos totales", f"{len(df)}")
 st.sidebar.caption("Sistema de apoyo a la decisión. Las predicciones no sustituyen el diagnóstico técnico.")
 
 
@@ -825,7 +874,7 @@ if opcion == "🔍 Consultar vehículo":
             mostrar_dato("Marca", "marca")
             mostrar_dato("Modelo", "modelo")
         with c2:
-            mostrar_dato("Año", "anio", decimales=0)
+            mostrar_dato("Año", "anio")
             mostrar_dato("Tipo de vehículo", "tipo_vehiculo")
             mostrar_dato("Combustible", "combustible")
         with c3:
@@ -1677,7 +1726,7 @@ elif opcion == "🔄 Actualización del modelo":
     total_pendientes = int(estados_actualizacion.str.casefold().eq("pendiente").sum())
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("Históricos", f"{total_historicos:,}")
+    c1.metric("Históricos", f"{total_historicos}")
     c2.metric("Validados", total_validados)
     c3.metric("Pendientes", total_pendientes)
 
@@ -1923,6 +1972,54 @@ elif opcion == "🔄 Actualización del modelo":
         "El rollback permanece en modo simulación (dry-run): "
         "no modifica el modelo de producción."
     )
+
+
+    st.divider()
+
+    # --------------------------------------------------------
+    # 5. CONSOLIDACIÓN DE DATOS - SIMULACIÓN SEGURA
+    # --------------------------------------------------------
+    st.subheader("5. Consolidación de datos validados")
+
+    st.write(
+        "Comprueba qué registros validados quedarían listos para incorporarse "
+        "al histórico al finalizar un ciclo de actualización."
+    )
+
+    if st.button(
+        "🧪 Simular consolidación",
+        type="secondary",
+        key="btn_v11_simular_consolidacion",
+    ):
+        resultado_consolidacion = simular_consolidacion_validados()
+
+        if resultado_consolidacion is None:
+            st.error("No fue posible identificar el estado de los registros de seguimiento.")
+        elif resultado_consolidacion["cantidad_validados"] == 0:
+            st.info("No existen registros validados disponibles para consolidación.")
+        else:
+            st.markdown("✓ **Simulación de consolidación completada correctamente.**")
+
+            cc1, cc2 = st.columns(2)
+            cc1.metric(
+                "Histórico actual",
+                f"{resultado_consolidacion['historico_actual']}",
+            )
+            cc2.metric(
+                "Histórico resultante",
+                f"{resultado_consolidacion['historico_resultante']}",
+            )
+
+            if resultado_consolidacion["ids"]:
+                st.caption(
+                    "Registros identificados: "
+                    + ", ".join(resultado_consolidacion["ids"])
+                )
+
+            st.info(
+                "Simulación segura: los registros de prueba no fueron incorporados "
+                "al histórico y ningún archivo fue modificado."
+            )
 
 
 # ============================================================
