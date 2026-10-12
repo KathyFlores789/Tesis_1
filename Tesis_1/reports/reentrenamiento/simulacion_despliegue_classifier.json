@@ -1,5 +1,5 @@
 {
-  "fecha_hora": "2026-10-07T12:18:06",
+  "fecha_hora": "2026-10-09T19:30:19",
   "accion": "simulacion_aprobacion_despliegue",
   "quality_gate": "APTO_TECNICAMENTE_PROMOCION_BLOQUEADA",
   "modelo_activo": "models\\classifier_v2.joblib",
