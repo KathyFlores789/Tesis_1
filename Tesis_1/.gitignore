@@ -1,0 +1,16 @@
+# Credenciales
+.env
+.env.*
+!.env.example
+KEY.docx
+
+# Entornos virtuales
+.venv/
+.venv_old/
+
+# Archivos temporales
+__pycache__/
+*.pyc
+
+# Datos de seguimiento y pruebas
+data/seguimiento/
