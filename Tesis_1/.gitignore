@@ -7,10 +7,14 @@ KEY.docx
 # Entornos virtuales
 .venv/
 .venv_old/
+venv/
 
 # Archivos temporales
 __pycache__/
 *.pyc
+*.pyo
 
 # Datos de seguimiento y pruebas
 data/seguimiento/
+
+requirements_backup.txt

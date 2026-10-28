@@ -229,11 +229,13 @@ Usa texto simple, sin tablas ni formato Markdown complejo.
 
             try:
                 response = client.models.generate_content(
-                    model=modelo_nombre,
-                    contents=prompt
+                model=modelo_nombre,
+                contents=prompt
                 )
 
                 if response.text:
+                    print(f"MODELO GEMINI UTILIZADO: {modelo_nombre}")
+                    print(f"MODELO REPORTADO POR API: {getattr(response, 'model_version', 'No disponible')}")
                     return response.text.strip()
 
                 ultimo_error = RuntimeError(
