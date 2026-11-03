@@ -18,6 +18,7 @@ La aplicación cuenta con una interfaz web desarrollada en Streamlit.
 - Generación de recomendaciones preventivas con Gemini.
 - Seguimiento de vehículos mediante registros separados del conjunto histórico.
 - Funciones de evaluación y actualización controlada de modelos.
+- Exploración experimental de cinco sistemas de falla mediante un clasificador de bajo rendimiento, cuyos resultados son orientativos y no constituyen diagnósticos validados.
 
 ## 3. Tecnologías utilizadas
 
@@ -103,8 +104,19 @@ src/          Procesamiento, predicción, SHAP e IA generativa
 requirements.txt
 README.md
 ```
+## 9. Modelos utilizados
 
-## 9. Consideraciones y limitaciones
+La aplicación Streamlit V11 integra tres modelos de aprendizaje automático almacenados en la carpeta `models/`, cada uno con una finalidad específica:
+
+- **`classifier_v2.joblib`:** modelo principal de clasificación que estima la probabilidad de que un vehículo presente una falla durante los próximos 30 días.
+- **`regressor_v2.joblib`:** modelo de regresión utilizado para calcular un costo orientativo condicionado a la ocurrencia de una falla.
+- **`system_classifier_v1.joblib`:** modelo experimental de Regresión Logística que presenta una distribución estimada entre cinco posibles sistemas de falla.
+
+Los modelos de clasificación principal y regresión son necesarios para el funcionamiento del análisis predictivo. El clasificador de sistemas de falla es opcional y se mantiene únicamente con fines exploratorios, debido a su rendimiento limitado.
+
+Este componente experimental no modifica las predicciones principales ni se utiliza como fundamento de las recomendaciones generadas mediante Inteligencia Artificial Generativa. Sus resultados requieren validación adicional y no sustituyen la inspección técnica del vehículo.
+
+## 10. Consideraciones y limitaciones
 
 Las predicciones son estimaciones estadísticas y no constituyen un diagnóstico mecánico confirmado.
 
@@ -114,6 +126,34 @@ Los costos estimados son orientativos y no representan cotizaciones del taller.
 
 Las recomendaciones generadas por Gemini deben ser contrastadas con una inspección técnica realizada por personal calificado.
 
-## 10. Finalidad académica
+El módulo experimental de identificación de sistemas de falla utiliza un clasificador de Regresión Logística entrenado sobre registros con falla futura. En su evaluación final obtuvo una exactitud del 22,86 % y un F1-macro de 0,2282 sobre 70 casos de prueba. Debido a su rendimiento limitado y a la ausencia de calibración de las probabilidades, sus resultados se muestran únicamente con fines exploratorios. Este componente no modifica la predicción principal de riesgo ni la estimación de costos, y sus porcentajes no se transmiten directamente al generador de recomendaciones de Gemini desde la aplicación.
+
+## 11. Finalidad académica
 
 Este repositorio contiene el desarrollo de un proyecto de titulación de la Maestría en Inteligencia Artificial Aplicada, orientado al análisis predictivo y al apoyo de decisiones de mantenimiento vehicular.
+
+## 12. Registro de versiones y control de cambios
+
+El desarrollo de LenoX Garage se gestionó mediante Git y GitHub, utilizando la rama principal `main` para mantener un historial de modificaciones del código fuente, la interfaz y la documentación.
+
+Entre los principales hitos registrados se encuentran:
+
+| Identificador | Descripción del cambio |
+|---|---|
+| `09cec4a` | Registro de la versión inicial del proyecto. |
+| `2eba2b4` | Desarrollo de la versión V2 de Streamlit e incorporación del ingreso de nuevos vehículos. |
+| `e09a623` | Modificaciones relacionadas con Streamlit y el registro de vehículos. |
+| `f79a02e` | Respaldo del proyecto previo a la incorporación de la versión V9. |
+| `2f94035` y `e5eec1e` | Ajustes en el despliegue de información y porcentajes. |
+| `3aa4729` | Ajustes de formato y simulación. |
+| `8110189` y `5cb3af1` | Incorporación de figuras del proyecto. |
+| `e4a2db9` y `6971ece` | Exclusión y eliminación de archivos que contenían credenciales. |
+| `66f2970` | Actualización de documentación y eliminación de archivos temporales del seguimiento de Git. |
+
+La aplicación utilizada en la evaluación del prototipo corresponde al archivo `app/app_v11.py`.
+
+El historial completo de cambios puede consultarse en el repositorio:
+
+https://github.com/KathyFlores789/Tesis_1/commits/main
+
+Los identificadores anteriores corresponden a commits de Git y no necesariamente a versiones funcionales independientes de la aplicación.
