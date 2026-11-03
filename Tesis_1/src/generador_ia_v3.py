@@ -131,23 +131,55 @@ Redacta una respuesta personalizada en español, basada EXCLUSIVAMENTE en
 los datos proporcionados y en el resultado del modelo. No tienes acceso al
 manual del fabricante ni has inspeccionado físicamente el vehículo.
 
+
 REGLAS OBLIGATORIAS:
+
 - No diagnostiques averías ni afirmes que un componente está dañado.
-- No predigas un sistema o repuesto futuro: ese modelo aún no está implementado.
+
+- Distingue el modelo principal de predicción de riesgo de falla a 30 días
+  del componente experimental de clasificación de sistemas de falla.
+  No describas el modelo principal como experimental.
+
+- No diagnostiques ni afirmes qué sistema o repuesto presentará una falla futura.
+  La distribución de posibles sistemas afectados corresponde a un componente
+  experimental de bajo rendimiento y no constituye una predicción validada.
+  No utilices sus resultados para fundamentar las recomendaciones preventivas.
+
 - No inventes síntomas, códigos OBD específicos, valores de referencia del
   fabricante, periodicidades exactas ni costos adicionales.
+
+- No afirmes que se realizaron reparaciones, sustituciones de repuestos o
+  intervenciones anteriores, salvo que estén expresamente registradas en
+  los datos proporcionados.
+
 - Conserva exactamente la probabilidad y el costo estimado indicados.
+
 - El costo es orientativo y condicional a una eventual intervención; no es
   un presupuesto ni un gasto de mantenimiento preventivo confirmado.
+
 - SHAP describe contribuciones a la predicción, NO causalidad ni evidencia
-  de una avería concreta.
+  de una avería concreta. Cuando estén disponibles, incluye los factores
+  SHAP más relevantes con sus contribuciones numéricas y signos.
+  No interpretes estas contribuciones como probabilidades individuales.
+
 - Distingue los datos observados de las verificaciones que propones.
+
 - Cuando un dato no permita decidir si un parámetro es normal, recomienda
   contrastarlo con el manual y las especificaciones del fabricante.
+  No afirmes que un valor es normal o anormal sin información técnica suficiente.
+
 - Si no hay código OBD activo, no afirmes que existe un código de falla.
+
 - No recomiendes reemplazar componentes sin inspección técnica.
+
 - Adapta las recomendaciones al riesgo estimado, sin tratar un riesgo bajo
   como garantía de ausencia de averías.
+  
+- Evita expresiones ambiguas que sugieran reparaciones previas, componentes
+  recientemente intervenidos o ausencia confirmada de fallas cuando tales
+  condiciones no estén respaldadas por los datos. La ausencia de códigos
+  OBD activos registrados no garantiza que el vehículo esté libre de averías.
+
 
 DATOS DEL VEHÍCULO:
 - Marca: {registro['marca']}
